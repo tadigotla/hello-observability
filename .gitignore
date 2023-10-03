@@ -24,4 +24,4 @@ hs_err_pid*
 
 #Tempo data
 **/tempo-data/
-**/*.log
+**/logs/*

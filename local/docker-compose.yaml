@@ -8,8 +8,8 @@ services:
     volumes:
       # Log files. They are all also accessible to the agent container,
       # through docker volume mount
-      - ./logs/hello-observability.log:/tmp/hello-observability.log
-      - ./logs/access_log.log:/tmp/access_log.log
+      # - ./logs/hello-observability.log:/tmp/hello-observability.log
+      - ./logs:/tmp
     environment:
       # Tracing configuration
       JAVA_TOOL_OPTIONS: -javaagent:./opentelemetry-javaagent.jar    
@@ -97,8 +97,9 @@ services:
       # Agent configuration
       - ./config/agent.yaml:/etc/agent-config/agent.yaml
       # Log files
-      - ./logs/hello-observability.log:/tmp/hello-observability.log
-      - ./logs/access_log.log:/tmp/access_log.log
+      - ./logs:/tmp
+      # - ./logs/hello-observability.log:/tmp/hello-observability.log
+      # - ./logs/access_log.log:/tmp/access_log.log
     entrypoint:
       - /bin/agent
       - -config.file=/etc/agent-config/agent.yaml
