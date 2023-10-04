@@ -1,8 +1,8 @@
 server:
   http_listen_port: 3200
 
-search_enabled: true
-metrics_generator_enabled: true
+# search_enabled: true
+# metrics_generator_enabled: true
 
 distributor:
   receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
@@ -36,11 +36,11 @@ storage:
     backend: local                     # backend configuration to use
     block:
       bloom_filter_false_positive: .05 # bloom filter false positive rate.  lower values create larger filters but fewer false positives
-      index_downsample_bytes: 1000     # number of bytes per index record
-      encoding: zstd                   # block encoding/compression.  options: none, gzip, lz4-64k, lz4-256k, lz4-1M, lz4, snappy, zstd, s2
+      v2_index_downsample_bytes: 1000     # number of bytes per index record
+      v2_encoding: zstd                   # block encoding/compression.  options: none, gzip, lz4-64k, lz4-256k, lz4-1M, lz4, snappy, zstd, s2
     wal:
       path: /tmp/tempo/wal             # where to store the the wal locally
-      encoding: snappy                 # wal encoding/compression.  options: none, gzip, lz4-64k, lz4-256k, lz4-1M, lz4, snappy, zstd, s2
+      v2_encoding: snappy                 # wal encoding/compression.  options: none, gzip, lz4-64k, lz4-256k, lz4-1M, lz4, snappy, zstd, s2
     local:
       path: /tmp/tempo/blocks
     pool:
@@ -70,5 +70,5 @@ metrics_generator:
 
 
 overrides:
-  max_search_bytes_per_trace: 5000000
+  # max_search_bytes_per_trace: 5000000
   metrics_generator_processors: ['service-graphs', 'span-metrics']

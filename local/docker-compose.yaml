@@ -8,8 +8,8 @@ services:
     volumes:
       # Log files. They are all also accessible to the agent container,
       # through docker volume mount
-      # - ./logs/hello-observability.log:/tmp/hello-observability.log
-      - ./logs:/tmp
+      - ./logs/hello-observability.log:/tmp/hello-observability.log
+      - ./logs/access_log.log:/tmp/access_log.log
     environment:
       # Tracing configuration
       JAVA_TOOL_OPTIONS: -javaagent:./opentelemetry-javaagent.jar    
@@ -39,7 +39,7 @@ services:
       - "3100:3100"
      
   tempo:
-    image: grafana/tempo:1.5.0
+    image: grafana/tempo:latest
     container_name: tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
@@ -91,17 +91,17 @@ services:
       - "3000:3000"
 
   agent:
-    image: grafana/agent:v0.32.1
+    image: grafana/agent:latest
     container_name: grafana-agent
     volumes:
       # Agent configuration
       - ./config/agent.yaml:/etc/agent-config/agent.yaml
       # Log files
-      - ./logs:/tmp
-      # - ./logs/hello-observability.log:/tmp/hello-observability.log
-      # - ./logs/access_log.log:/tmp/access_log.log
+      # - ./logs:/tmp
+      - ./logs/hello-observability.log:/tmp/hello-observability.log
+      - ./logs/access_log.log:/tmp/access_log.log
     entrypoint:
-      - /bin/agent
+      - /bin/grafana-agent
       - -config.file=/etc/agent-config/agent.yaml
       - -metrics.wal-directory=/tmp/agent/wal
       - -enable-features=integrations-next
