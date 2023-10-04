@@ -116,10 +116,10 @@ public class HelloObservabilityBootApp {
 	/**
 	 * Expose Prometheus metrics.
 	 */
-	@Bean
-	public ServletRegistrationBean<MetricsServlet> metricsServlet() {
-		ServletRegistrationBean<MetricsServlet> bean = new ServletRegistrationBean<>(new MetricsServlet(), "/metrics");
-		bean.setLoadOnStartup(1);
-		return bean;
-	}
+	// @Bean
+	// public ServletRegistrationBean<MetricsServlet> metricsServlet() {
+	// 	ServletRegistrationBean<MetricsServlet> bean = new ServletRegistrationBean<>(new MetricsServlet(), "/metrics");
+	// 	bean.setLoadOnStartup(1);
+	// 	return bean;
+	// }
 }

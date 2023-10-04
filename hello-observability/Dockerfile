@@ -1,4 +1,4 @@
-FROM openjdk:11.0.1-jre-slim-stretch
+FROM openjdk:17-ea-jdk-slim-buster
 EXPOSE 8080
 ARG JAR=hello-observability.jar
 COPY target/$JAR /app.jar
