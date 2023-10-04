@@ -1,18 +1,21 @@
 package org.grafana;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
-import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +26,13 @@ import java.io.IOException;
 public class HelloObservabilityBootApp {
 
 	private final OkHttpClient client = new OkHttpClient();
+
+	private final Tracer tracer;
+
+	@Autowired
+	public HelloObservabilityBootApp(Tracer tracer) {
+		this.tracer = tracer;
+	}
 
 	// Counter should have Exemplars when the OpenTelemetry agent is attached.
 	private final Counter requestCounter = Counter.build().name("requests_total").help("Total number of requests.")
@@ -81,12 +91,13 @@ public class HelloObservabilityBootApp {
 	}
 
 	@GetMapping("/observability")
+	@WithSpan(kind = SpanKind.INTERNAL)
 	public String observability() throws IOException {
 		String path = "/observability";
 		requestCounter.labels(path).inc();
 		lastRequestTimestamp.labels(path).setToCurrentTime();
 		Histogram.Timer histogramRequestTimer = requestDurationHistogram.labels(path).startTimer();
-		Summary.Timer summaryRequestTimer = requestDurationSummary.labels(path).startTimer();		
+		Summary.Timer summaryRequestTimer = requestDurationSummary.labels(path).startTimer();
 
 		try {
 			// Generate some random errors
@@ -98,8 +109,7 @@ public class HelloObservabilityBootApp {
 			} catch (InterruptedException e) {
 				throw new IOException(e);
 			}
-		}
-		finally {
+		} finally {
 			histogramRequestTimer.observeDuration();
 			summaryRequestTimer.observeDuration();
 		}
@@ -107,6 +117,7 @@ public class HelloObservabilityBootApp {
 		return "Observability";
 	}
 
+	@WithSpan
 	private void randomError(String path) throws IOException {
 		if (Math.random() > 0.9) {
 			throw new IOException("Random error with " + path + "!");
@@ -118,8 +129,9 @@ public class HelloObservabilityBootApp {
 	 */
 	// @Bean
 	// public ServletRegistrationBean<MetricsServlet> metricsServlet() {
-	// 	ServletRegistrationBean<MetricsServlet> bean = new ServletRegistrationBean<>(new MetricsServlet(), "/metrics");
-	// 	bean.setLoadOnStartup(1);
-	// 	return bean;
+	// ServletRegistrationBean<MetricsServlet> bean = new
+	// ServletRegistrationBean<>(new MetricsServlet(), "/metrics");
+	// bean.setLoadOnStartup(1);
+	// return bean;
 	// }
 }
